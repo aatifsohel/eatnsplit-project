@@ -24,16 +24,22 @@ const initialFriends = [
 
 function App() {
   const [showAddFriend, setShowAddFriend] = useState(false);
+  const [friends, setFriends] = useState(initialFriends);
 
   function handleShowAddFriend() {
     setShowAddFriend(show => !show);
   }
 
+  function handleAddFriend(friend) {
+    setFriends(friends => [...friends, friend]);
+    setShowAddFriend(false);
+  }
+
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendsList />
-        {showAddFriend && <FormAddFriend />}
+        <FriendsList friends={friends} />
+        {showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
         <Button onClick={handleShowAddFriend}>
           {showAddFriend ? "Close" : "Add Friend"}
         </Button>
@@ -43,11 +49,10 @@ function App() {
   );
 }
 
-function FriendsList() {
-  const data = initialFriends;
+function FriendsList({ friends }) {
   return (
     <ul>
-      {data.map(friend => (
+      {friends.map(friend => (
         <Friend friend={friend} key={friend.id} />
       ))}
     </ul>
@@ -83,14 +88,42 @@ function Button({ onClick, children }) {
   );
 }
 
-function FormAddFriend() {
+function FormAddFriend({ onAddFriend }) {
+  const [name, setName] = useState("");
+  const [image, setImage] = useState("https://i.pravatar.cc/48");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!name || !image) return;
+
+    // img url gives you random image each time but id will remember the image and you'll get exact same image
+    const id = crypto.randomUUID();
+
+    const newFriend = {
+      id,
+      name,
+      image: `${image}?=${id}`,
+      balance: 0,
+    };
+
+    onAddFriend(newFriend);
+
+    setName("");
+    setImage("https://i.pravatar.cc/48");
+  }
+
   return (
-    <form className="form-add-friend">
+    <form className="form-add-friend" onSubmit={handleSubmit}>
       <label>🧑Friend name</label>
-      <input type="text" />
+      <input type="text" value={name} onChange={e => setName(e.target.value)} />
 
       <label>🖼️Image URL</label>
-      <input type="text" />
+      <input
+        type="text"
+        value={image}
+        onChange={e => setImage(e.target.value)}
+      />
 
       <Button>Add</Button>
     </form>
