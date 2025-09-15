@@ -26,10 +26,48 @@ function App() {
   const [count, setCount] = useState(0);
 
   return (
-    <>
-      <h1>Eat-N-Split</h1>
-    </>
+    <div className="app">
+      <div className="sidebar">
+        <FriendsList />
+      </div>
+    </div>
   );
+}
+
+function FriendsList() {
+  const data = initialFriends;
+  return (
+    <ul>
+      {data.map(friend => (
+        <Friend friend={friend} key={friend.id} />
+      ))}
+    </ul>
+  );
+}
+
+function Friend({ friend }) {
+  return (
+    <li>
+      <img src={friend.image} alt={friend.name} />
+      <h3>{friend.name}</h3>
+      {friend.balance < 0 && (
+        <p className="red">
+          You owe {friend.name} ${Math.abs(friend.balance)}
+        </p>
+      )}
+      {friend.balance > 0 && (
+        <p className="green">
+          {friend.name} owes you ${Math.abs(friend.balance)}
+        </p>
+      )}
+      {friend.balance === 0 && <p>You and {friend.name} are even</p>}
+      <Button>Select</Button>
+    </li>
+  );
+}
+
+function Button({ children }) {
+  return <button className="button">{children}</button>;
 }
 
 export default App;
